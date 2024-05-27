@@ -1,15 +1,16 @@
 package com.meta.apigateway.config;
 
 import com.meta.apigateway.filter.AuthenticationFilter;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.web.DefaultSecurityFilterChain;
+import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
+import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.web.server.SecurityWebFilterChain;
 
-@EnableWebSecurity
+
+@Configuration
+@EnableWebFluxSecurity
 public class SecurityConfig {
 
     private final AuthenticationFilter authenticationFilter;
@@ -17,15 +18,16 @@ public class SecurityConfig {
         this.authenticationFilter = authenticationFilter;
     }
     @Bean
-    protected void configure(HttpSecurity http) throws Exception {
-         http.csrf((csrf) -> csrf.disable())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .exceptionHandling(exception -> exception.authenticationEntryPoint((request, response, ex) -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED)))
-                .authorizeHttpRequests((authorize) ->
-                        authorize
-                                .requestMatchers("/api/v1/auth/**")
-                                .permitAll()
-                                .anyRequest().authenticated()
-                ).build();
+    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
+        return http
+                .csrf((csrf) -> csrf.disable())
+                .httpBasic((httpBasic) -> httpBasic.disable())
+                .authorizeExchange(exchanges ->
+                        exchanges
+                                .pathMatchers("/auth-service/api/v1/auth/**", "/ping").permitAll()
+                                .anyExchange().authenticated()
+                )
+                .addFilterAt(authenticationFilter, SecurityWebFiltersOrder.AUTHENTICATION)
+                .build();
     }
 }
