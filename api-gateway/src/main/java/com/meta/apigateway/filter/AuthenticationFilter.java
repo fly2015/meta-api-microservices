@@ -10,6 +10,7 @@ import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
@@ -23,19 +24,21 @@ import java.util.stream.Collectors;
 public class AuthenticationFilter implements WebFilter {
     public static final String HEADER = "Authorization";
     public static final String HEADER_VALUE_PREFIX = "Bearer";
-    private static final String JWT_PARSE_URL = "http://auth-service/v1/jwt/parse";
-    private final RestTemplate restTemplate;
-
-    public AuthenticationFilter(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
+    private static final String JWT_PARSE_URL = "http://auth-service/api/v1/jwt/parse";
+    //private final RestTemplate restTemplate;
+    private final WebClient webClient;
+    public AuthenticationFilter(WebClient.Builder webClientBuilder) {
+        this.webClient = webClientBuilder.build();
     }
 
-    private JwtParseResponseDto parseJwt(String token) {
-        JwtParseResponseDto responseDto = restTemplate.postForObject(JWT_PARSE_URL, new JwtParseRequestDto(token),
-                JwtParseResponseDto.class);
-
-        Objects.requireNonNull(responseDto);
-        return responseDto;
+    private Mono<JwtParseResponseDto> parseJwt(String token) {
+        /*JwtParseResponseDto responseDto = webClient.postForObject(JWT_PARSE_URL, new JwtParseRequestDto(token),
+                JwtParseResponseDto.class);*/
+        return webClient.post()
+                .uri(JWT_PARSE_URL)
+                .bodyValue(new JwtParseRequestDto(token))
+                .retrieve()
+                .bodyToMono(JwtParseResponseDto.class);
     }
 
     @Override
@@ -46,20 +49,17 @@ public class AuthenticationFilter implements WebFilter {
         String token = request.getHeaders().getFirst(HEADER);
         if (token != null) {
             token = token.replace(HEADER_VALUE_PREFIX + " ", "");
-
-            try {
-                JwtParseResponseDto responseDto = parseJwt(token);
-
-                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                        responseDto.getUsername(),
-                        null,
-                        responseDto.getAuthorities().stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList())
-                );
-                SecurityContextImpl securityContext = new SecurityContextImpl(auth);
-                return chain.filter(exchange).contextWrite(ReactiveSecurityContextHolder.withSecurityContext(Mono.just(securityContext)));
-            } catch (Exception ignore) {
-                return chain.filter(exchange).contextWrite(ReactiveSecurityContextHolder.clearContext());
-            }
+            return parseJwt(token).flatMap(responseDto ->
+                    {
+                        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                                responseDto.getUsername(),
+                                null,
+                                responseDto.getAuthorities().stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList())
+                        );
+                        SecurityContextImpl securityContext = new SecurityContextImpl(auth);
+                        return chain.filter(exchange).contextWrite(ReactiveSecurityContextHolder.withSecurityContext(Mono.just(securityContext)));
+                    })
+                    .onErrorResume(e -> chain.filter(exchange).contextWrite(ReactiveSecurityContextHolder.clearContext()));
         }
 
         return chain.filter(exchange);

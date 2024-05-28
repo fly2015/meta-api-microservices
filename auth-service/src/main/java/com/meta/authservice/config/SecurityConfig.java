@@ -61,7 +61,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((authorize) ->
                         authorize
                                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/actuator/prometheus", "/actuator/prometheus/**", "/prometheus", "/prometheus/**").permitAll()
-                                .requestMatchers("/api/v1/auth/**").permitAll()
+                                .requestMatchers("/api/v1/auth/**", "/api/v1/jwt/**").permitAll()
                                 .requestMatchers("/api/v1/users").hasAnyRole("ADMIN")
                                 .requestMatchers("/api/v1/users/**").hasAnyRole("ADMIN")
                                 //.requestMatchers("/api/v1/users").permitAll()
