@@ -19,7 +19,7 @@ CREATE TABLE Book (
 );
 
 CREATE TABLE Version (
-    version_id SERIAL PRIMARY KEY,
+    version_id INT AUTO_INCREMENT PRIMARY KEY,
     book_id INT NOT NULL,
     edition_number INT,
     publication_date DATE,

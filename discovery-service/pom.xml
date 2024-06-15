@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.meta</groupId>
-    <artifactId>discovery-service</artifactId>
+    <artifactId>discoveryservice</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>discovery-service</name>
     <description>discovery-service</description>
