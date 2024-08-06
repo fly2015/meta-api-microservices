@@ -651,3 +651,182 @@ public class ConsumerExample {
 ```
 
 In this example, the consumer continuously polls for new messages from the "my-topic" topic and prints out the offset, key, and value of each message.
+
+### Do we need a server for kafka or it is included in Spring?
+Apache Kafka is a separate system that runs on its own servers. It is not included with Spring Boot or any other Spring project. Kafka is a distributed streaming platform that needs to be installed and run on one or more servers, depending on your requirements for fault tolerance and capacity.
+
+Spring provides a project called Spring for Apache Kafka which is a part of the Spring ecosystem and provides a high-level abstraction for Kafka-based messaging solutions. It provides a template as a high-level abstraction for sending messages. It also provides support for Message-driven POJOs with `@KafkaListener` annotations and a listener container.
+
+However, this does not include the Kafka server itself. You would need to set up and manage the Kafka server separately. The Spring for Apache Kafka project simply provides a way to integrate your Spring application with Kafka.
+
+Here is a simple example of how you can use Spring for Apache Kafka to send a message to a Kafka topic:
+
+```java
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.stereotype.Service;
+
+@Service
+public class KafkaProducer {
+
+    @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
+
+    public void sendMessage(String msg) {
+        kafkaTemplate.send("myTopic", msg);
+    }
+}
+```
+
+In this example, `KafkaTemplate` is a Spring-managed bean that wraps a Kafka producer. The `sendMessage` method sends a message to the "myTopic" topic. But remember, the Kafka server must be properly set up and running for this code to work.
+
+
+### How consumer consume message from borker?
+In Apache Kafka, a consumer consumes messages from a broker by following these steps:
+
+1. The consumer subscribes to one or more topics it's interested in.
+2. The consumer pulls messages from the broker. The broker returns messages from the partitions of the topics the consumer is subscribed to.
+3. The consumer keeps track of what messages it has consumed by storing the offset of messages it has read. The next time it pulls messages, it requests messages with offsets greater than the ones it has already read.
+4. If a consumer fails and restarts, it can resume consuming messages from where it left off by using the stored offset.
+
+Here's a simple example of a Kafka consumer in Java:
+
+```java
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+
+import java.time.Duration;
+import java.util.Collections;
+import java.util.Properties;
+
+public class ConsumerExample {
+    public static void main(String[] args) {
+        Properties props = new Properties();
+        props.put("bootstrap.servers", "localhost:9092");
+        props.put("group.id", "test");
+        props.put("enable.auto.commit", "true");
+        props.put("auto.commit.interval.ms", "1000");
+        props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        
+        KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
+        consumer.subscribe(Collections.singletonList("my-topic"));
+        
+        while (true) {
+            ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
+            for (ConsumerRecord<String, String> record : records) {
+                System.out.printf("offset = %d, key = %s, value = %s%n", record.offset(), record.key(), record.value());
+            }
+        }
+    }
+}
+```
+
+In this example, the consumer continuously polls for new messages from the "my-topic" topic and prints out the offset, key, and value of each message.
+
+### where offset infor is stored, it is in the kafka server or applciation server? How to reset offset?
+The offset information is stored in a special Kafka topic named `__consumer_offsets`. Each consumer group has its own set of offsets for each topic partition it is consuming from. These offsets are committed back to Kafka periodically (either automatically or manually), and Kafka stores them in the `__consumer_offsets` topic.
+
+To reset the offset, you can use the Kafka consumer group command-line tool provided by Kafka. Here's an example of how to reset the offset for a specific topic and consumer group:
+
+```bash
+./bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --group my-consumer-group --topic my-topic --reset-offsets --to-earliest --execute
+```
+
+In this command:
+
+- `--bootstrap-server localhost:9092` specifies the address of the Kafka broker.
+- `--group my-consumer-group` specifies the consumer group.
+- `--topic my-topic` specifies the topic.
+- `--reset-offsets` indicates that you want to reset the offsets.
+- `--to-earliest` sets the offset to the earliest available message in each partition.
+- `--execute` executes the reset. If you omit this option, the command will just display what would be done without actually doing it.
+
+Please note that resetting offsets can lead to either message duplication or message loss, depending on whether you reset the offset to an earlier or later position. Therefore, it should be done with caution.
+
+
+### How producer produce message to broker?
+In Apache Kafka, a producer sends messages to a Kafka broker following these steps:
+
+1. The producer creates a message. This message includes the topic to which the message should be sent, and optionally a key and a value. The key and value are the actual content of the message.
+
+2. The producer uses a KafkaProducer object to send the message. The KafkaProducer requires a set of properties including the addresses of the Kafka brokers, the key serializer, and the value serializer. The serializers are used to convert the key and value objects to byte arrays, as Kafka brokers only store bytes.
+
+3. The KafkaProducer sends the message to the appropriate Kafka broker for the specified topic. If a key is included in the message, the producer uses a partitioner to determine which partition of the topic to send the message to. By default, the partitioner uses a hash of the key to choose a partition, ensuring that all messages with the same key go to the same partition.
+
+Here's a simple example of a Kafka producer in Java:
+
+```java
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerRecord;
+
+import java.util.Properties;
+
+public class ProducerExample {
+    public static void main(String[] args) {
+        // Set up the properties
+        Properties props = new Properties();
+        props.put("bootstrap.servers", "localhost:9092");
+        props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+
+        // Create the producer
+        KafkaProducer<String, String> producer = new KafkaProducer<>(props);
+
+        // Create a message
+        ProducerRecord<String, String> record = new ProducerRecord<>("myTopic", "myKey", "myValue");
+
+        // Send the message
+        producer.send(record);
+
+        // Close the producer
+        producer.close();
+    }
+}
+```
+
+In this example, a KafkaProducer is created with properties that specify the Kafka brokers' addresses and the serializers for the key and value. A message with a topic, key, and value is created and sent using the producer. Finally, the producer is closed to free up resources.
+
+### how we send a message to specific partition?
+In Apache Kafka, you can send a message to a specific partition by specifying the partition number when creating a `ProducerRecord`. Here's an example in Java:
+
+```java
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerRecord;
+
+import java.util.Properties;
+
+public class SpecificPartitionProducer {
+    public static void main(String[] args) {
+        // Set up the properties
+        Properties props = new Properties();
+        props.put("bootstrap.servers", "localhost:9092");
+        props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+
+        // Create the producer
+        KafkaProducer<String, String> producer = new KafkaProducer<>(props);
+
+        // Create a message
+        String topic = "myTopic";
+        int partition = 0; // specify the partition number
+        String key = "myKey";
+        String value = "myValue";
+        ProducerRecord<String, String> record = new ProducerRecord<>(topic, partition, key, value);
+
+        // Send the message
+        producer.send(record);
+
+        // Close the producer
+        producer.close();
+    }
+}
+```
+
+In this example, a `ProducerRecord` is created with a specific partition number. The message is then sent to that specific partition in the Kafka topic. Please note that partition numbers are zero-based and the partition specified must exist, otherwise, an exception will be thrown.
+
+### is it normal if the broker will automatically select partition in the topic to send message?
+Yes, it is normal and a part of Kafka's default behavior. When a producer sends a message without specifying a partition, the Kafka broker will automatically select a partition for that message. This selection can be based on a round-robin strategy or a hash of the message key, depending on the producer's configuration.
+
+However, if you want to have more control over which partition a message goes to, you can specify the partition number when sending a message. This is less common and is typically only done when you have a specific reason for sending certain messages to certain partitions.
