@@ -60,7 +60,7 @@ public class SecurityConfig {
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint))
                 .authorizeHttpRequests((authorize) ->
                         authorize
-                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/actuator/prometheus", "/actuator/prometheus/**", "/prometheus", "/prometheus/**").permitAll()
+                                .requestMatchers("/v3/api-docs", "/api-docs/**", "/webjars/**","/swagger-ui.html", "/swagger-ui/**",  "/favicon.ico", "/actuator/**", "/actuator/prometheus", "/actuator/prometheus/**", "/prometheus", "/prometheus/**").permitAll()
                                 .requestMatchers("/api/v1/auth/**", "/api/v1/jwt/**").permitAll()
                                 .requestMatchers("/api/v1/users").hasAnyRole("ADMIN")
                                 .requestMatchers("/api/v1/users/**").hasAnyRole("ADMIN")

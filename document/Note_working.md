@@ -1,29 +1,6 @@
-spring:
-datasource:
-#url: jdbc:h2:mem:./bookdb
-url: jdbc:h2:file:./bookdb
-driver-class-name: org.h2.Driver
-username: sa
-password:
-h2:
-console:
-enabled: true
+### Create and run H2 database
+### Run servicesSetup Swagger: using only the new spring open-api
+### Call authentication from api-gateway to auth-service
+    1.  Yes, you can delegate requests from the api-gateway to the target service without creating a specific controller in the api-gateway by using Spring Cloud Gateway. This allows you to route requests to the appropriate service based on the URL path. 
 
-# Set root logging level to DEBUG
-logging:
-level:
-root: DEBUG
-# Set logging level for specific packages
-org.springframework: DEBUG
-com.yourpackage: DEBUG
-
-server:
-port: 28080
-
-# Path: Note_working.md
-## run h2 server
-java -cp h2-2.2.224.jar org.h2.tools.Server -tcp -tcpPort 9092 -web -webPort 8082
-
-
-# todo
-Enhance security by enabale security in every service.
+### Call get users list from api-gateway to user-service.
