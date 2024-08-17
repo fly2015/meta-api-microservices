@@ -10,8 +10,8 @@ public class OpenApiConfig {
     @Bean
     public GroupedOpenApi authApi() {
         return GroupedOpenApi.builder()
-                .group("auth-service")
-                .pathsToMatch("/api/v1/auth/**", "/api/v1/jwt/parse")
+                .group("auth") // This is the name of the group(service name without "service")
+                .pathsToMatch("api-docs/**")
                 .build();
     }
 

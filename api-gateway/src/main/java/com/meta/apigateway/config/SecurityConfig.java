@@ -25,6 +25,7 @@ public class SecurityConfig {
                 .authorizeExchange(exchanges ->
                         exchanges
                                 .pathMatchers("/auth-service/api/v1/auth/**","/api/v1/auth/**", "/ping", "/v3/api-docs/**",
+                                        "/auth-service/api-docs/**", "/auth-service/v3/api-docs/**",
                                         "/v3/api-docs.yaml","/v3/api-docs", "/api-docs/**", "/webjars/**","/swagger-ui.html", "/swagger-ui/**",  "/favicon.ico", "/actuator/**").permitAll()
                                 .anyExchange().authenticated()
                 )
