@@ -11,4 +11,5 @@ public interface ReviewService {
     List<Review> getAllReviews();
     Review getReviewById(Long reviewId);
     List<Review> getReviewsByUserId(Long userId);
+    List<Review> getReviewsByBookId(Long productId);
 }

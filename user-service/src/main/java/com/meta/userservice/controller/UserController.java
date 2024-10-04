@@ -47,7 +47,7 @@ public class UserController {
     public User createUser(@RequestBody
                            User user)
     {
-        log.info("process=create-user, user_email={}", user.getEmail());
+       // log.info("process=create-user, user_email={}", user.getEmail());
         return userService.createUser(user);
     }
 
@@ -57,7 +57,7 @@ public class UserController {
                            Long id, @RequestBody
                            User user)
     {
-        log.info("process=update-user, user_id={}", id);
+        //log.info("process=update-user, user_id={}", id);
         user.setId(id);
         return userService.updateUser(user);
     }
@@ -67,7 +67,7 @@ public class UserController {
     public void deleteUser(@PathVariable
                            Long id)
     {
-        log.info("process=delete-user, user_id={}", id);
+        //log.info("process=delete-user, user_id={}", id);
         userService.deleteUser(id);
     }
 

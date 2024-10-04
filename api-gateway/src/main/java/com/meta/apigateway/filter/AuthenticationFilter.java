@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Component
+//@Component
 public class AuthenticationFilter implements WebFilter {
     public static final String HEADER = "Authorization";
     public static final String HEADER_VALUE_PREFIX = "Bearer";

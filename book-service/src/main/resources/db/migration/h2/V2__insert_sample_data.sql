@@ -38,9 +38,9 @@ INSERT INTO Users (username, password, email, role_id) VALUES
 ('user1', 'password1', 'user1@example.com', 1),
 ('user2', 'password2', 'user2@example.com', 2);*/
 
-INSERT INTO USERS (user_id, username, password, name, email, enabled, last_password_reset_date) VALUES
-                                                                                               (1, 'admin', '$2a$10$zuI3P8hoZNkFGR2dDPW9juA1C1xIHBUNrKMGqjjaEKsLTwjJkKoNa', 'Admin', 'admin@gmail.com', true, CURRENT_TIMESTAMP()),
-                                                                                               (2, 'siva', '$2a$10$LskLrNP6m.dEpXYjT41lRePseXJEjhd6.sPH2Z5GbbShtaFRWoeYq', 'Siva', 'siva@gmail.com', true, CURRENT_TIMESTAMP());
+INSERT INTO USERS (username, password, name, email, enabled, last_password_reset_date) VALUES
+                                                                                               ('admin', '$2a$10$zuI3P8hoZNkFGR2dDPW9juA1C1xIHBUNrKMGqjjaEKsLTwjJkKoNa', 'Admin', 'admin@gmail.com', true, CURRENT_TIMESTAMP()),
+                                                                                               ('hng', '$2a$10$LskLrNP6m.dEpXYjT41lRePseXJEjhd6.sPH2Z5GbbShtaFRWoeYq', 'Siva', 'siva@gmail.com', true, CURRENT_TIMESTAMP());
 
 INSERT INTO ROLES (role_id, name) VALUES
                                  (1, 'ROLE_USER'),

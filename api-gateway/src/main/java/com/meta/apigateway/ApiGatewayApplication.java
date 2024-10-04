@@ -24,17 +24,17 @@ public class ApiGatewayApplication {
         SpringApplication.run(ApiGatewayApplication.class, args);
     }
 
-    /*@Bean
+    @Bean
     @Lazy(false)
     public Set<AbstractSwaggerUiConfigProperties.SwaggerUrl> apis(RouteDefinitionLocator locator, SwaggerUiConfigParameters swaggerUiConfigParameters) {
         Set<AbstractSwaggerUiConfigProperties.SwaggerUrl> urls = new HashSet<>();
         List<RouteDefinition> definitions = locator.getRouteDefinitions().collectList().block();
         definitions.stream().filter(routeDefinition -> routeDefinition.getId().matches(".*-service")).forEach(routeDefinition -> {
             String name = routeDefinition.getId().replaceAll("-service", "");
-            AbstractSwaggerUiConfigProperties.SwaggerUrl swaggerUrl = new AbstractSwaggerUiConfigProperties.SwaggerUrl(name, "/api-docs"+"/" + name + "*-service", null);
+            AbstractSwaggerUiConfigProperties.SwaggerUrl swaggerUrl = new AbstractSwaggerUiConfigProperties.SwaggerUrl(name, "/api-docs"+"/" + name, null);
             urls.add(swaggerUrl);
         });
         swaggerUiConfigParameters.setUrls(urls);
         return urls;
-    }*/
+    }
 }

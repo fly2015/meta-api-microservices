@@ -7,11 +7,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class OpenApiConfig {
 
-    @Bean
+/*    @Bean
     public GroupedOpenApi authApi() {
         return GroupedOpenApi.builder()
                 .group("auth") // This is the name of the group(service name without "service")
-                .pathsToMatch("api-docs/**")
+                .pathsToMatch("/api-docs/**")
                 .build();
     }
 
@@ -21,5 +21,5 @@ public class OpenApiConfig {
                 .group("user-service")
                 .pathsToMatch("/api/v1/users/**")
                 .build();
-    }
+    }*/
 }

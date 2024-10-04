@@ -9,7 +9,15 @@ spring:
         - id: user-service
           uri: lb://user-service
           predicates:
-            - Path=/api/v1/users/**
+            - Path=/api/v1/users/**, /api-docs/user
+        - id: book-service
+          uri: lb://book-service
+          predicates:
+            - Path=/api/v1/book/**, /api-docs/book
+        - id: review-service
+          uri: lb://review-service
+          predicates:
+            - Path=/api/v1/review/**, /api-docs/review
 eureka:
   client:
     serviceUrl:

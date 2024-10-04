@@ -20,7 +20,7 @@ public class Review {
     private Integer userId;
 
     @Column(name = "book_id")
-    private Integer book;
+    private Integer bookId;
 
     @Column(name = "rating")
     private Integer rating;
