@@ -32,6 +32,11 @@ Notification Service:
     Use message queues such as RabbitMQ or Apache Kafka for asynchronous communication between microservices.
     Send notifications via email, SMS, or push notifications using Spring Mail or third-party services.
 
+Order Service:
+    Develop an Order Service microservice to manage book orders, shopping carts, and payments.
+    Integrate with payment gateways such as Stripe or PayPal for processing payments securely.
+    Implement endpoints for creating orders, updating order status, and handling payment transactions.
+
 Configuration Management:
     Use Spring Cloud Config Server to centralize configuration management and externalize configuration settings for microservices.
     Store configuration properties in a version-controlled repository (e.g., Git) and retrieve them dynamically at runtime.
